@@ -4,50 +4,153 @@
 	<meta charset="utf8">
 </head>
 <body>
-	<p>Hello Python-マイページ-</p>
-	<p>ようこそ{{ name }} さん</p>
-	<p>みんなのメモリストです</p>
-	<form action="/regist" method="post">
+	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<div id="app">
+<hr>
+
+<p>メモ登録</p>
+	<form action="/registMemo" method="POST">
 		<p><input type="text" name="category" placeholder="カテゴリ"></p>
-		<!--追加されたカテゴリを配列に格納し、リストレンダリングでチェックボックス作りたいところ-->
 		<p><input type="text" name="main" placeholder="メモ"></p>
 		<p><input type="text" name="link" placeholder="リンク"></p>
-		<p><input type="submit" name="submit" value="submit"></p>
+		<button type="submit">REGIST MEMO</button>
 	</form>
-	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
-	<script
+
+<hr>
+	<p>ユーザー登録</p>
+	<form action="/registUser" method="POST">
+		<p><input type="text" placeholder="ユーザー"></p>
+		<p><input type="text" placeholder="パスワード"></p>
+		<button type="submit">REGIST USER</button>
+	</form>
+<hr>
+	<p>全ユーザー</p>
+	<button v-on:click="getAllUser">GET ALL USER</button>
+<hr>
+	<p>全メモ</p>
+	<button v-on:click="getAllMemo">GET ALL MEMO</button>
+    <table>
+	</table>
+</div>
+<script
   src="https://code.jquery.com/jquery-3.4.0.min.js"
   integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
   crossorigin="anonymous"></script>
-    <table>
-	</table>
 	<script>
 		var app;
 		$(document).ready(function(){
 			app = new Vue({
-					created:function(){
-						var result = [];
-						var _this = this
-						$.ajax({
-							type:'POST',
-							url:'/getMemo',
-							dataType:"json",
-							contentType:'application/json',
-							success:function(response) {
-							for(var i=0;i<response.length;i++){
-								result.push({
-									"id":response[i].id,
-									"category":response[i].category,
-									"main":response[i].main,
-									"link":response[i].link
-								})
-							}
+					el:'#app',
+					data:{
+						User:[],
+						Memo:[],
+						category:'',
+						main:'',
+						link:'',
+						user:'',
+						password:''
+					},
+					methods:{
+						getAllMemo:function(){
+							var result = [];
+							var _this = this
+
+							$.ajax({
+								type:'POST',
+								url:'/getAllMemo',
+								dataType:"json",
+								contentType:'application/json',
+								success:function(response) {
+
+								for(var i=0;i<response.length;i++){
+									result.push({
+										"id":response[i].id,
+										"category":response[i].category,
+										"main":response[i].main,
+										"link":response[i].link
+									})
+								}
 							_this.createList(result)
 							  return;
 							}
 						})
-					},
-					methods:{
+						},
+						registMemo:function(){
+							var result = [];
+
+							$.ajax({
+								type:'POST',
+								url:'/registMemo',
+								dataType:"json",
+								data:{
+									category:this.category,
+									main:this.main,
+									link:this.link
+								},
+								contentType:'application/json',
+								success:function(response) {
+
+								for(var i=0;i<response.length;i++){
+									result.push({
+										"id":response[i].id,
+										"category":response[i].category,
+										"main":response[i].main,
+										"link":response[i].link
+									})
+								}
+							console.log(result)
+							  return;
+							}
+						})
+						},
+						getAllUser:function(){
+							var result = [];
+							var _this = this
+
+							$.ajax({
+								type:'POST',
+								url:'/getAllUser',
+								dataType:"json",
+								contentType:'application/json',
+								success:function(response) {
+
+								for(var i=0;i<response.length;i++){
+									result.push({
+										"id":response[i].id,
+										"name":response[i].name
+									})
+								}
+								console.log(result)
+							  return;
+							}
+						})
+						},
+						registUser:function(){
+							var result = [];
+
+							$.ajax({
+								type:'POST',
+								url:'/registUser',
+								dataType:"json",
+								data:{
+									name:this.name,
+									password:this.password
+								},
+								contentType:'application/json',
+								success:function(response) {
+
+								for(var i=0;i<response.length;i++){
+									result.push({
+										"id":response[i].id,
+										"name":response[i].name,
+										"password":response[i].password
+									})
+								}
+							console.log(result)
+							  return;
+							}
+						})
+						},
 						createList:function(list){
 							console.log('create list start')
 							console.log(list)

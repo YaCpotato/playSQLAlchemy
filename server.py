@@ -36,25 +36,28 @@ def mypage():
     	all()
 
 		#27行目でsessionのクエリを発行したので追加してコミットする
-		session.add(user)  
+		session.add(user)
 		session.commit()
 
 		#持ってきたレコードを順に見ていく
 		for user in users:
-			if(user.password == password):
-
+			if user.password == password:
+			
 				#passwordが合っているのが見つかったら、idとnameを
 				session.name = name
+				login = True
+		
+		if(login):
+			#mypageのHTMLをレンダリング
+			return render_template('mypage.html',name=session.name)
+		else:
 
-				#mypageのHTMLをレンダリング
-				return render_template('mypage.html',name=session.name)
-			else:
-				#合ってなかったら、ログイン失敗、リダイレクト
-				return redirect(url_for('index'))
+			#合ってなかったら、ログイン失敗、リダイレクト
+			return redirect(url_for('index'))
 
 #メモ登録リクエストがきたら
-@app.route('/regist',methods=['POST'])
-def regist():
+@app.route('/registMemo',methods=['POST'])
+def registMemo():
 	if request.method == 'POST':
 
 		#カテゴリとメイン項目を空欄では受け付けない
@@ -84,10 +87,57 @@ def regist():
 			return redirect(url_for('/mypage'))
 	
 
-		
+#ユーザー登録リクエストがきたら
+@app.route('/registUser',methods=['POST'])
+def registUser():
+	if request.method == 'POST':
+
+		#カテゴリとメイン項目を空欄では受け付けない
+		if(len(request.json['user'])!=0 or len(request.json['password'])!=0):
+
+			#requestで飛んできたカテゴリ、メイン、リンクを変数に格納
+			name = request.json['user']
+			password = request.text['password']
+
+			#memoListテーブルのセッションを作成
+			user = User()
+
+			#格納した変数をそれぞれテーブルのレコードにセットする
+			user.name = name
+			user.passowrd = password
+
+			#sessionのクエリを発行したので追加してコミットする
+			session.add(User)
+			session.commit()
+
+			#mypageにレンダリング
+			return render_template('mypage.html',name=session.name)
+		else:
+			#登録に失敗したらリダイレクト
+			return redirect(url_for('/mypage'))
+	
+
+
+
+#ユーザーリストのgetter
+@app.route('/getAllUser', methods=['POST'])
+def getAllUser():
+
+	#memoListセッションを作成
+	user = User()
+
+	#memoListテーブルの全レコードを持ってくる
+	result = session.query(User).all()
+	
+	#list型のresultをjsonにダンプ
+	result = json.dumps(result, cls=AlchemyEncoder)
+
+	#resultをリターンする-->Javascriptのajaxのresponseに入る
+   	return result
+
 #メモリストのgetter
-@app.route('/getMemo', methods=['POST'])
-def getAllList():
+@app.route('/getAllMemo', methods=['POST'])
+def getAllMemo():
 
 	#memoListセッションを作成
 	memoList = MemoList()
