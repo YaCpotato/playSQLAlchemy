@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf8">
+</head>
+<body>
+	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<div id="app">
+<div id="regist">
+				<p>メモ登録</p>
+				<form action="/registMemo" method="POST">
+					<p><input type="text" name="category" placeholder="カテゴリ"></p>
+					<p><input type="text" name="main" placeholder="メモ"></p>
+					<p><input type="text" name="link" placeholder="リンク"></p>
+					<button type="submit">REGIST MEMO</button>
+				</form>
+			
+				<p>ユーザー登録</p>
+				<form action="/registUser" method="POST">
+					<p><input type="text" placeholder="ユーザー"></p>
+					<p><input type="text" placeholder="パスワード"></p>
+					<button type="submit">REGIST USER</button>
+				</form>
+		<p>
+		INSERT INTO `テーブル名` (カラム名1, カラム名2,,,) VALUES (%s, %s, %s)<br>
+		(u'sample', u'sample', u'sample')
+		</p>
+</div>
+<hr>
+<div id="Allgetter">
+	<p>全ユーザー</p>
+	<button v-on:click="getAllUser">GET ALL USER</button>
+	<p>全メモ</p>
+	<button v-on:click="getAllMemo">GET ALL MEMO</button>
+	<p>
+	SELECT テーブル名.カラム名1 AS テーブル名_カラム名1,,,FROM users 
+	</p>
+    <table>
+	</table>
+</div>
+<div id="where">
+	<p>全ユーザー</p>
+	<button v-on:click="getUser">GET WHERE ID > 10 USER</button>
+	<p>
+	SELECT テーブル名.カラム名1 AS テーブル名_カラム名1,,, FROM users WHERE users.id > %s
+	</p>
+</div>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.4.0.min.js"
+  integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
+  crossorigin="anonymous"></script>
+	<script>
+		var app;
+		$(document).ready(function(){
+			app = new Vue({
+					el:'#app',
+					data:{
+						User:[],
+						Memo:[],
+						category:'',
+						main:'',
+						link:'',
+						user:'',
+						password:''
+					},
+					methods:{
+						getAllMemo:function(){
+							var result = [];
+							var _this = this
+
+							$.ajax({
+								type:'POST',
+								url:'/getAllMemo',
+								dataType:"json",
+								contentType:'application/json',
+								success:function(response) {
+
+								for(var i=0;i<response.length;i++){
+									result.push({
+										"id":response[i].id,
+										"category":response[i].category,
+										"main":response[i].main,
+										"link":response[i].link
+									})
+								}
+							_this.createList(result)
+							  return;
+							}
+						})
+						},
+						registMemo:function(){
+							var result = [];
+
+							$.ajax({
+								type:'POST',
+								url:'/registMemo',
+								dataType:"json",
+								data:{
+									category:this.category,
+									main:this.main,
+									link:this.link
+								},
+								contentType:'application/json',
+								success:function(response) {
+
+								for(var i=0;i<response.length;i++){
+									result.push({
+										"id":response[i].id,
+										"category":response[i].category,
+										"main":response[i].main,
+										"link":response[i].link
+									})
+								}
+							console.log(result)
+							  return;
+							}
+						})
+						},
+						getAllUser:function(){
+							var result = [];
+							var _this = this
+
+							$.ajax({
+								type:'POST',
+								url:'/getAllUser',
+								dataType:"json",
+								contentType:'application/json',
+								success:function(response) {
+
+								for(var i=0;i<response.length;i++){
+									result.push({
+										"id":response[i].id,
+										"name":response[i].name
+									})
+								}
+								console.log(result)
+							  return;
+							}
+						})
+						},
+						getUser:function(){
+							var result = [];
+							var _this = this
+
+							$.ajax({
+								type:'POST',
+								url:'/getUser',
+								dataType:"json",
+								contentType:'application/json',
+								success:function(response) {
+
+								for(var i=0;i<response.length;i++){
+									result.push({
+										"id":response[i].id,
+										"name":response[i].name
+									})
+								}
+								console.log(result)
+							  return;
+							}
+						})
+						},
+						registUser:function(){
+							var result = [];
+
+							$.ajax({
+								type:'POST',
+								url:'/registUser',
+								dataType:"json",
+								data:{
+									name:this.name,
+									password:this.password
+								},
+								contentType:'application/json',
+								success:function(response) {
+
+								for(var i=0;i<response.length;i++){
+									result.push({
+										"id":response[i].id,
+										"name":response[i].name,
+										"password":response[i].password
+									})
+								}
+							console.log(result)
+							  return;
+							}
+						})
+						},
+						createList:function(list){
+							console.log('create list start')
+							console.log(list)
+							console.log(list.length)
+							for(var i=0;i<list.length;i++){
+								$('table').append('<tr></tr>')
+								$('table').append('<td id="list-id">'+list[i].id+'</td>');
+								$('table').append('<td id="list-cat">'+list[i].category+'</td>');
+								$('table').append('<td id="list-main">'+list[i].main+'</td>');
+								$('table').append('<td id="list-link">'+list[i].link+'</td>');
+							}	
+						}
+					}
+			})
+		})
+			</script>
+<style>
+table{
+	background-color: white;
+	width:1000px;
+}
+td{
+	background-color:rgb(255, 255, 255);
+}
+tr{
+	background-color: beige;
+}
+#list-id{
+	background-color:khaki;
+	width:25px;
+}
+#list-cat{
+	height:auto;
+	width:100px;
+	background-color: lightgreen;
+}
+#list-main{
+	height:auto;
+	width:250px;
+	background-color:lightskyblue;
+}
+#list-link{
+	height:auto;
+	width:250px;
+	overflow-x: scroll;
+}
+
+</style>
+	
+</body>
+</html>

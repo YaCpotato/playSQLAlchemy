@@ -135,6 +135,24 @@ def getAllUser():
 	#resultをリターンする-->Javascriptのajaxのresponseに入る
    	return result
 
+@app.route('/getUser', methods=['POST'])
+def getUser():
+
+	#memoListセッションを作成
+	user = User()
+
+	#memoListテーブルの全レコードを持ってくる
+	result = session.query(User).\
+    	filter(User.id > 10).\
+    	all()
+	
+	#list型のresultをjsonにダンプ
+	result = json.dumps(result, cls=AlchemyEncoder)
+
+	#resultをリターンする-->Javascriptのajaxのresponseに入る
+   	return result
+
+
 #メモリストのgetter
 @app.route('/getAllMemo', methods=['POST'])
 def getAllMemo():
